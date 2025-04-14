@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-import time
+from streamlit_autorefresh import st_autorefresh
 
 # ============================
 # 🔧 Konfigurasi Halaman
@@ -15,7 +15,7 @@ st.set_page_config(
 # ============================
 # ⏰ Auto-refresh tiap 60 detik
 # ============================
-st.query_params["t"] = int(time.time() // 60)
+st_autorefresh(interval=60 * 1000, key="refresh")
 
 # ============================
 # ⏰ Tampilkan Jam + Tanggal
@@ -39,14 +39,11 @@ st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 91
 # ============================
 # 📁 Load Data dari Google Sheets
 # ============================
-# st.subheader("📂 Mengambil data dari Google Sheets...")
-
 sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"  # Ganti dengan ID dokumenmu
 sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
 
 try:
     df = pd.read_csv(sheet_url)
-    # st.success("✅ Data berhasil dimuat dari Google Sheets.")
 except Exception as e:
     st.error(f"❌ Gagal membaca file dari Google Sheets. Pesan error:\n{e}")
     st.stop()
@@ -171,6 +168,5 @@ if "Tanggal Open" in df_tampil.columns:
     for i, val in enumerate(minggu_count.values):
         ax5.text(i, val + 0.5, str(val), ha='center')
     st.pyplot(fig5)
-
 else:
     st.warning("Kolom 'Tanggal Open' tidak ditemukan atau kosong.")
