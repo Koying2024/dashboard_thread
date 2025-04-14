@@ -1,23 +1,6 @@
-import streamlit as st
-st.set_page_config(
-    page_title="Dashboard Thread TOP GUN",
-    page_icon="📊",
-)
-
-import pandas as pd
-import matplotlib.pyplot as plt
-from datetime import datetime
-from streamlit_autorefresh import st_autorefresh
-
-
 # ============================
-# 🔧 Konfigurasi Halaman
+# 📦 IMPORT LIBRARY
 # ============================
-st.set_page_config(
-    page_title="Dashboard Thread TOP GUN",
-    page_icon="📊",
-)
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,52 +8,28 @@ from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
 # ============================
-# 🔧 Konfigurasi Halaman
+# 🔧 KONFIGURASI HALAMAN
 # ============================
 st.set_page_config(
     page_title="Dashboard Thread TOP GUN",
     page_icon="📊",
+    layout="wide"
 )
 
 # ============================
-# 📅 Tampilkan Tanggal Hari Ini dalam Bahasa Indonesia
+# 📅 TAMPILKAN TANGGAL HARI INI (BAHASA INDONESIA)
 # ============================
-
-# Mapping nama hari dan bulan
 nama_hari = {
-    "Monday": "Senin",
-    "Tuesday": "Selasa",
-    "Wednesday": "Rabu",
-    "Thursday": "Kamis",
-    "Friday": "Jumat",
-    "Saturday": "Sabtu",
-    "Sunday": "Minggu"
+    "Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu",
+    "Thursday": "Kamis", "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu"
 }
-
 nama_bulan = {
-    "January": "Januari",
-    "February": "Februari",
-    "March": "Maret",
-    "April": "April",
-    "May": "Mei",
-    "June": "Juni",
-    "July": "Juli",
-    "August": "Agustus",
-    "September": "September",
-    "October": "Oktober",
-    "November": "November",
-    "December": "Desember"
+    "January": "Januari", "February": "Februari", "March": "Maret", "April": "April",
+    "May": "Mei", "June": "Juni", "July": "Juli", "August": "Agustus",
+    "September": "September", "October": "Oktober", "November": "November", "December": "Desember"
 }
-
-# Ambil tanggal sekarang
 now = datetime.now()
-hari_inggris = now.strftime("%A")
-bulan_inggris = now.strftime("%B")
-
-# Format tanggal dalam Bahasa Indonesia
-tanggal_hari_ini = f"{nama_hari[hari_inggris]}, {now.day:02d} {nama_bulan[bulan_inggris]} {now.year}"
-
-# Tampilkan tanggal di kanan atas
+tanggal_hari_ini = f"{nama_hari[now.strftime('%A')]}, {now.day:02d} {nama_bulan[now.strftime('%B')]} {now.year}"
 st.markdown(
     f"""
     <div style='text-align: right; font-size:16px; font-weight:bold; color:#FFFFFF; background-color:#262730; padding:10px; border-radius:10px; margin-bottom:20px'>
@@ -80,20 +39,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-
 # ============================
-# 📌 Judul Dashboard
+# 📌 JUDUL DASHBOARD
 # ============================
 st.title("📊 Dashboard Thread")
 st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 911 - TOP GUN !!!")
 
 # ============================
-# 📁 Load Data dari Google Sheets
+# 📁 LOAD DATA DARI GOOGLE SHEETS
 # ============================
 sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"
 sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
-
 try:
     df = pd.read_csv(sheet_url)
 except Exception as e:
@@ -101,14 +57,14 @@ except Exception as e:
     st.stop()
 
 # ============================
-# 🔍 Filter Awal
+# 🔍 FILTER DATA AWAL
 # ============================
-df_filtered = df[df['Title'].notna() & (df['Title'] != "")]
+df = df[df['Title'].notna() & (df['Title'] != "")]
 kolom_non = ["Week", "Month", "Days", "Year", "Title Validation", "Validation", "Keyword", "insight", "insight Standarized"]
-df_tampil = df_filtered.drop(columns=kolom_non, errors='ignore')
+df_tampil = df.drop(columns=kolom_non, errors='ignore')
 
 # ============================
-# 🎯 Filter
+# 🎯 FUNGSI FILTER DINAMIS
 # ============================
 def buat_filter(nama_kolom, judul, emoji):
     st.subheader(f"{emoji} Filter Berdasarkan {judul}")
@@ -125,13 +81,12 @@ df_tampil = buat_filter("Role", "Role", "👥")
 df_tampil = buat_filter("Title", "Title", "🏷️")
 
 # ============================
-# 📈 Pie Chart: Status
+# 📈 PIE CHART STATUS
 # ============================
 st.subheader("📈 Distribusi Status")
 if not df_tampil.empty and "Status" in df_tampil.columns:
     status_count = df_tampil["Status"].value_counts()
-    total = status_count.sum()
-    labels = [f"{s} ({(c/total)*100:.1f}%) ({c})" for s, c in status_count.items()]
+    labels = [f"{s} ({(c/status_count.sum())*100:.1f}%) ({c})" for s, c in status_count.items()]
     fig1, ax1 = plt.subplots()
     ax1.pie(status_count, labels=labels, startangle=90, colors=plt.cm.Pastel1.colors)
     ax1.axis("equal")
@@ -140,7 +95,7 @@ else:
     st.info("Tidak ada data untuk visualisasi Status.")
 
 # ============================
-# 📊 Bar Chart: Site
+# 📊 BAR CHART SITE
 # ============================
 st.subheader("🏢 Distribusi Jumlah per Site")
 if not df_tampil.empty and "Site" in df_tampil.columns:
@@ -158,7 +113,7 @@ else:
     st.info("Tidak ada data untuk visualisasi Site.")
 
 # ============================
-# 📊 Bar Chart Horizontal: Role
+# 📊 BAR CHART ROLE
 # ============================
 st.subheader("👥 Distribusi Jumlah per Role")
 if not df_tampil.empty and "Role" in df_tampil.columns:
@@ -175,19 +130,19 @@ else:
     st.info("Tidak ada data untuk visualisasi Role.")
 
 # ============================
-# 📋 Tabel Data
+# 📋 TABEL DATA
 # ============================
 st.subheader("✅ Data Setelah Difilter")
 st.dataframe(df_tampil)
 
 # ============================
-# 🧾 Ringkasan
+# 🧾 RINGKASAN
 # ============================
 st.subheader("📌 Ringkasan")
 st.write(f"Jumlah data setelah filter: **{len(df_tampil)} baris**")
 
 # ============================
-# 📅 Thread per Bulan dan Minggu
+# 📅 THREAD PER BULAN & MINGGU
 # ============================
 st.subheader("📆 Jumlah Thread per Bulan & Minggu")
 if "Tanggal Open" in df_tampil.columns:
@@ -196,7 +151,7 @@ if "Tanggal Open" in df_tampil.columns:
     df_tampil["Bulan"] = df_tampil["Tanggal Open"].dt.strftime('%Y-%m')
     df_tampil["Minggu"] = df_tampil["Tanggal Open"].dt.strftime('%Y-W%U')
 
-    # Bulan
+    # Bar Chart Bulanan
     bulan_count = df_tampil["Bulan"].value_counts().sort_index()
     fig4, ax4 = plt.subplots(figsize=(10, 5))
     bars = ax4.bar(bulan_count.index, bulan_count.values, color='cornflowerblue')
@@ -208,7 +163,7 @@ if "Tanggal Open" in df_tampil.columns:
         ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, int(bar.get_height()), ha='center')
     st.pyplot(fig4)
 
-    # Minggu
+    # Line Chart Mingguan
     minggu_count = df_tampil["Minggu"].value_counts().sort_index()
     fig5, ax5 = plt.subplots(figsize=(12, 5))
     ax5.plot(minggu_count.index, minggu_count.values, marker='o', color='seagreen')
