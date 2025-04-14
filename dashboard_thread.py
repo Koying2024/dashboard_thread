@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import time
-import os
 
 # ============================
 # 🔧 Konfigurasi Halaman
@@ -14,7 +13,12 @@ st.set_page_config(
 )
 
 # ============================
-# ⏰ Tampilkan Jam Sekarang
+# ⏰ Auto-refresh tiap 60 detik
+# ============================
+st.query_params["t"] = int(time.time() // 60)
+
+# ============================
+# ⏰ Tampilkan Jam + Tanggal
 # ============================
 now = datetime.now().strftime("%A, %d %B %Y %I:%M:%S %p")
 st.markdown(
@@ -33,153 +37,140 @@ st.title("📊 Dashboard Thread")
 st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 911 - TOP GUN !!!")
 
 # ============================
-# 📁 Load Data
+# 📁 Load Data dari Google Sheets
 # ============================
-excel_path = r"C:\Users\karimudin\OneDrive - Zi.Care\Documents - Data Team - Zi.Care\General\#005-User Story DevOps\Recap Top Gun 20250227.xlsx"
+st.subheader("📂 Mengambil data dari Google Sheets...")
 
-if not os.path.exists(excel_path):
-    st.error("File Excel tidak ditemukan. Pastikan path file benar.")
+sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"  # Ganti dengan ID dokumenmu
+sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+
+try:
+    df = pd.read_csv(sheet_url)
+    st.success("✅ Data berhasil dimuat dari Google Sheets.")
+except Exception as e:
+    st.error(f"❌ Gagal membaca file dari Google Sheets. Pesan error:\n{e}")
     st.stop()
-
-df = pd.read_excel(excel_path)
 
 # ============================
 # 🔍 Filter Awal
 # ============================
-if 'Title' not in df.columns:
-    st.error("Kolom 'Title' tidak ditemukan dalam file Excel.")
-    st.stop()
-
 df_filtered = df[df['Title'].notna() & (df['Title'] != "")]
 kolom_non = ["Week", "Month", "Days", "Year", "Title Validation", "Validation", "Keyword", "insight", "insight Standarized"]
 df_tampil = df_filtered.drop(columns=kolom_non, errors='ignore')
 
 # ============================
-# 🎛️ Filter Interaktif
+# 🎯 Filter
 # ============================
-def buat_filter(kolom_nama, label):
-    if kolom_nama in df_tampil.columns:
-        st.subheader(label)
-        pilihan = st.multiselect(f"Pilih {label.split()[-1]}:", df_tampil[kolom_nama].dropna().unique())
-        if pilihan:
-            return df_tampil[df_tampil[kolom_nama].isin(pilihan)]
+def buat_filter(nama_kolom, judul, emoji):
+    st.subheader(f"{emoji} Filter Berdasarkan {judul}")
+    if nama_kolom in df_tampil.columns:
+        options = df_tampil[nama_kolom].dropna().unique()
+        selected = st.multiselect(f"Pilih {judul}:", options)
+        if selected:
+            return df_tampil[df_tampil[nama_kolom].isin(selected)]
     return df_tampil
 
-df_tampil = buat_filter('Site', "🏥 Filter Berdasarkan Site")
-df_tampil = buat_filter('Status', "🔍 Filter Berdasarkan Status")
-df_tampil = buat_filter('Role', "👥 Filter Berdasarkan Role")
-df_tampil = buat_filter('Title', "🏷️ Filter Berdasarkan Title")
+df_tampil = buat_filter("Site", "Site", "🏥")
+df_tampil = buat_filter("Status", "Status", "🔍")
+df_tampil = buat_filter("Role", "Role", "👥")
+df_tampil = buat_filter("Title", "Title", "🏷️")
 
 # ============================
-# 📊 Pie Chart Status
+# 📈 Pie Chart: Status
 # ============================
 st.subheader("📈 Distribusi Status")
-
-if not df_tampil.empty and 'Status' in df_tampil.columns:
-    status_count = df_tampil['Status'].value_counts().sort_values(ascending=False)
+if not df_tampil.empty and "Status" in df_tampil.columns:
+    status_count = df_tampil["Status"].value_counts()
     total = status_count.sum()
-    labels = [f"{status} ({(jumlah/total)*100:.1f}%) ({jumlah})" for status, jumlah in status_count.items()]
+    labels = [f"{s} ({(c/total)*100:.1f}%) ({c})" for s, c in status_count.items()]
 
-    fig_pie, ax_pie = plt.subplots()
-    colors = plt.cm.Pastel1.colors
-    ax_pie.pie(status_count, labels=labels, startangle=90, colors=colors)
-    ax_pie.axis('equal')
-    st.pyplot(fig_pie)
+    fig1, ax1 = plt.subplots()
+    ax1.pie(status_count, labels=labels, startangle=90, colors=plt.cm.Pastel1.colors)
+    ax1.axis("equal")
+    st.pyplot(fig1)
 else:
     st.info("Tidak ada data untuk visualisasi Status.")
 
 # ============================
-# 📊 Bar Chart Site
+# 📊 Bar Chart: Site
 # ============================
 st.subheader("🏢 Distribusi Jumlah per Site")
-
-if not df_tampil.empty and 'Site' in df_tampil.columns:
-    site_count = df_tampil['Site'].value_counts().sort_values(ascending=False)
-    fig_site, ax_site = plt.subplots()
-    bars = ax_site.bar(site_count.index, site_count.values, color='skyblue')
-    ax_site.set_xlabel("Site")
-    ax_site.set_ylabel("Jumlah")
-    ax_site.set_title("Jumlah Data per Site")
-    ax_site.set_xticklabels(site_count.index, rotation=45, ha='right')
-
+if not df_tampil.empty and "Site" in df_tampil.columns:
+    site_count = df_tampil["Site"].value_counts()
+    fig2, ax2 = plt.subplots()
+    bars = ax2.bar(site_count.index, site_count.values, color="skyblue")
+    ax2.set_xlabel("Site")
+    ax2.set_ylabel("Jumlah")
+    ax2.set_title("Jumlah Data per Site")
+    ax2.set_xticklabels(site_count.index, rotation=45, ha="right")
     for bar in bars:
-        yval = bar.get_height()
-        ax_site.text(bar.get_x() + bar.get_width()/2, yval + 0.5, int(yval), ha='center', va='bottom')
-
-    st.pyplot(fig_site)
+        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, int(bar.get_height()), ha='center')
+    st.pyplot(fig2)
 else:
     st.info("Tidak ada data untuk visualisasi Site.")
 
 # ============================
-# 📊 Bar Chart Role
+# 📊 Bar Chart Horizontal: Role
 # ============================
 st.subheader("👥 Distribusi Jumlah per Role")
-
-if not df_tampil.empty and 'Role' in df_tampil.columns:
-    role_count = df_tampil['Role'].value_counts().sort_values(ascending=True)
-    fig_role, ax_role = plt.subplots(figsize=(8, len(role_count) * 0.4))
-    bars = ax_role.barh(role_count.index, role_count.values, color='mediumseagreen')
-    ax_role.set_xlabel("Jumlah")
-    ax_role.set_ylabel("Role")
-    ax_role.set_title("Jumlah Data per Role")
-
+if not df_tampil.empty and "Role" in df_tampil.columns:
+    role_count = df_tampil["Role"].value_counts().sort_values()
+    fig3, ax3 = plt.subplots(figsize=(8, len(role_count) * 0.4))
+    bars = ax3.barh(role_count.index, role_count.values, color="mediumseagreen")
+    ax3.set_xlabel("Jumlah")
+    ax3.set_ylabel("Role")
+    ax3.set_title("Jumlah Data per Role")
     for bar in bars:
-        xval = bar.get_width()
-        ax_role.text(xval + 1, bar.get_y() + bar.get_height()/2, int(xval), va='center')
-
-    st.pyplot(fig_role)
+        ax3.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2, int(bar.get_width()), va='center')
+    st.pyplot(fig3)
 else:
     st.info("Tidak ada data untuk visualisasi Role.")
 
 # ============================
-# 📋 Data & Ringkasan
+# 📋 Tabel Data
 # ============================
 st.subheader("✅ Data Setelah Difilter")
 st.dataframe(df_tampil)
 
-st.subheader("🧾 Jumlah Row Data")
+# ============================
+# 🧾 Ringkasan
+# ============================
+st.subheader("📌 Ringkasan")
 st.write(f"Jumlah data setelah filter: **{len(df_tampil)} baris**")
 
 # ============================
-# 📆 Thread per Bulan & Minggu
+# 📅 Thread per Bulan dan Minggu
 # ============================
-if 'Tanggal Open' in df_tampil.columns:
-    df_tampil['Tanggal Open'] = pd.to_datetime(df_tampil['Tanggal Open'], errors='coerce')
-    df_tampil = df_tampil.dropna(subset=['Tanggal Open'])
+st.subheader("📆 Jumlah Thread per Bulan & Minggu")
+if "Tanggal Open" in df_tampil.columns:
+    df_tampil["Tanggal Open"] = pd.to_datetime(df_tampil["Tanggal Open"], errors="coerce")
+    df_tampil = df_tampil.dropna(subset=["Tanggal Open"])
+    df_tampil["Bulan"] = df_tampil["Tanggal Open"].dt.strftime('%Y-%m')
+    df_tampil["Minggu"] = df_tampil["Tanggal Open"].dt.strftime('%Y-W%U')
 
     # Bulan
-    st.subheader("📆 Jumlah Thread per Bulan")
-    df_tampil['Bulan'] = df_tampil['Tanggal Open'].dt.strftime('%Y-%m')
-    bulan_count = df_tampil['Bulan'].value_counts().sort_index()
-
-    fig_bulan, ax_bulan = plt.subplots(figsize=(10, 5))
-    bars = ax_bulan.bar(bulan_count.index, bulan_count.values, color='cornflowerblue')
-    ax_bulan.set_xlabel("Bulan")
-    ax_bulan.set_ylabel("Jumlah Thread")
-    ax_bulan.set_title("Jumlah Thread per Bulan")
-    ax_bulan.tick_params(axis='x', rotation=45)
-
+    bulan_count = df_tampil["Bulan"].value_counts().sort_index()
+    fig4, ax4 = plt.subplots(figsize=(10, 5))
+    bars = ax4.bar(bulan_count.index, bulan_count.values, color='cornflowerblue')
+    ax4.set_xlabel("Bulan")
+    ax4.set_ylabel("Jumlah Thread")
+    ax4.set_title("Jumlah Thread per Bulan")
+    ax4.tick_params(axis='x', rotation=45)
     for bar in bars:
-        yval = bar.get_height()
-        ax_bulan.text(bar.get_x() + bar.get_width()/2, yval + 0.5, int(yval), ha='center', va='bottom')
-
-    st.pyplot(fig_bulan)
+        ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, int(bar.get_height()), ha='center')
+    st.pyplot(fig4)
 
     # Minggu
-    st.subheader("📈 Jumlah Thread per Minggu")
-    df_tampil['Minggu'] = df_tampil['Tanggal Open'].dt.strftime('%Y-W%U')
-    minggu_count = df_tampil['Minggu'].value_counts().sort_index()
-
-    fig_minggu, ax_minggu = plt.subplots(figsize=(12, 5))
-    ax_minggu.plot(minggu_count.index, minggu_count.values, marker='o', color='seagreen')
-    ax_minggu.set_xlabel("Minggu (Tahun-W)")
-    ax_minggu.set_ylabel("Jumlah Thread")
-    ax_minggu.set_title("Jumlah Thread per Minggu")
-    ax_minggu.tick_params(axis='x', rotation=45)
-
+    minggu_count = df_tampil["Minggu"].value_counts().sort_index()
+    fig5, ax5 = plt.subplots(figsize=(12, 5))
+    ax5.plot(minggu_count.index, minggu_count.values, marker='o', color='seagreen')
+    ax5.set_xlabel("Minggu")
+    ax5.set_ylabel("Jumlah Thread")
+    ax5.set_title("Jumlah Thread per Minggu")
+    ax5.tick_params(axis='x', rotation=45)
     for i, val in enumerate(minggu_count.values):
-        ax_minggu.text(i, val + 0.5, str(val), ha='center', va='bottom', fontsize=8)
+        ax5.text(i, val + 0.5, str(val), ha='center')
+    st.pyplot(fig5)
 
-    st.pyplot(fig_minggu)
 else:
     st.warning("Kolom 'Tanggal Open' tidak ditemukan atau kosong.")
