@@ -15,12 +15,12 @@ st.set_page_config(
 # ============================
 # 🔄 Auto-refresh tiap 60 detik
 # ============================
-st_autorefresh(interval=10_000, key="refresh")  # 10 detik
+# st_autorefresh(interval=10_000, key="refresh")  # 10 detik
 
 # ============================
 # ⏰ Tampilkan Jam + Tanggal
 # ============================
-now = datetime.now().strftime("%A, %d %B %Y %I:%M:%S %p")
+now = datetime.now().strftime("%A, %d %B %Y)
 st.markdown(
     f"""
     <div style='text-align: right; font-weight: bold; font-size:16px; color:#FFF; background-color:#262730; padding:10px; border-radius:10px'>
