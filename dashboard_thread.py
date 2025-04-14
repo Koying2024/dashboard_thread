@@ -13,9 +13,9 @@ st.set_page_config(
 )
 
 # ============================
-# ⏰ Auto-refresh tiap 60 detik
+# 🔄 Auto-refresh tiap 60 detik
 # ============================
-st_autorefresh(interval=60 * 1000, key="refresh")
+st_autorefresh(interval=10_000, key="refresh")  # 10 detik
 
 # ============================
 # ⏰ Tampilkan Jam + Tanggal
@@ -39,7 +39,7 @@ st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 91
 # ============================
 # 📁 Load Data dari Google Sheets
 # ============================
-sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"  # Ganti dengan ID dokumenmu
+sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"
 sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
 
 try:
@@ -80,7 +80,6 @@ if not df_tampil.empty and "Status" in df_tampil.columns:
     status_count = df_tampil["Status"].value_counts()
     total = status_count.sum()
     labels = [f"{s} ({(c/total)*100:.1f}%) ({c})" for s, c in status_count.items()]
-
     fig1, ax1 = plt.subplots()
     ax1.pie(status_count, labels=labels, startangle=90, colors=plt.cm.Pastel1.colors)
     ax1.axis("equal")
