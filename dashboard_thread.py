@@ -1,8 +1,14 @@
 import streamlit as st
+st.set_page_config(
+    page_title="Dashboard Thread TOP GUN",
+    page_icon="📊",
+)
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
+
 
 # ============================
 # 🔧 Konfigurasi Halaman
