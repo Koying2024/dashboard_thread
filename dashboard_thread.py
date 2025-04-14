@@ -12,8 +12,8 @@ from streamlit_autorefresh import st_autorefresh
 # ============================
 st.set_page_config(
     page_title="Dashboard Thread TOP GUN",
-    page_icon="📊",
-    layout="wide"
+    page_icon="📊"
+    # layout="wide"
 )
 
 # ============================
