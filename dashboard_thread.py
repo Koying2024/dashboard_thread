@@ -44,12 +44,12 @@ st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 91
 sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"  # Ganti dengan ID dokumenmu
 sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
 
-try:
-    df = pd.read_csv(sheet_url)
-    st.success("✅ Data berhasil dimuat dari Google Sheets.")
-except Exception as e:
-    st.error(f"❌ Gagal membaca file dari Google Sheets. Pesan error:\n{e}")
-    st.stop()
+# try:
+#     df = pd.read_csv(sheet_url)
+#     st.success("✅ Data berhasil dimuat dari Google Sheets.")
+# except Exception as e:
+#     st.error(f"❌ Gagal membaca file dari Google Sheets. Pesan error:\n{e}")
+#     st.stop()
 
 # ============================
 # 🔍 Filter Awal
