@@ -13,22 +13,23 @@ st.set_page_config(
 )
 
 # ============================
-# 🔄 Auto-refresh tiap 60 detik
+# 📅 Tampilkan Tanggal Hari Ini dalam Bahasa Indonesia
 # ============================
-# st_autorefresh(interval=10_000, key="refresh")  # 10 detik
+now = datetime.now()
+hari_inggris = now.strftime("%A")
+bulan_inggris = now.strftime("%B")
 
-# ============================
-# ⏰ Tampilkan Jam + Tanggal
-# ============================
-now = datetime.now().strftime("%A, %d %B %Y)
+tanggal_hari_ini = f"{nama_hari[hari_inggris]}, {now.day:02d} {nama_bulan[bulan_inggris]} {now.year}"
+
 st.markdown(
     f"""
-    <div style='text-align: right; font-weight: bold; font-size:16px; color:#FFF; background-color:#262730; padding:10px; border-radius:10px'>
-        {now}
+    <div style='text-align: right; font-size:16px; font-weight:bold; color:#FFF; background-color:#262730; padding:10px; border-radius:10px'>
+        {tanggal_hari_ini}
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 # ============================
 # 📌 Judul Dashboard
