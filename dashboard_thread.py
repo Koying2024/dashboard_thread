@@ -39,7 +39,7 @@ st.write("Dashboard ini menyajikan informasi visual Thread berdasarkan Chanel 91
 # ============================
 # 📁 Load Data dari Google Sheets
 # ============================
-st.subheader("📂 Mengambil data dari Google Sheets...")
+# st.subheader("📂 Mengambil data dari Google Sheets...")
 
 sheet_id = "1TQrJEkRmeEek2GILWxzJrP25py2bxxS8"  # Ganti dengan ID dokumenmu
 sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
