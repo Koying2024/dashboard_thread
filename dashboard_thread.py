@@ -12,23 +12,68 @@ st.set_page_config(
     page_icon="📊",
 )
 
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
+
+# ============================
+# 🔧 Konfigurasi Halaman
+# ============================
+st.set_page_config(
+    page_title="Dashboard Thread TOP GUN",
+    page_icon="📊",
+)
+
 # ============================
 # 📅 Tampilkan Tanggal Hari Ini dalam Bahasa Indonesia
 # ============================
+
+# Mapping nama hari dan bulan
+nama_hari = {
+    "Monday": "Senin",
+    "Tuesday": "Selasa",
+    "Wednesday": "Rabu",
+    "Thursday": "Kamis",
+    "Friday": "Jumat",
+    "Saturday": "Sabtu",
+    "Sunday": "Minggu"
+}
+
+nama_bulan = {
+    "January": "Januari",
+    "February": "Februari",
+    "March": "Maret",
+    "April": "April",
+    "May": "Mei",
+    "June": "Juni",
+    "July": "Juli",
+    "August": "Agustus",
+    "September": "September",
+    "October": "Oktober",
+    "November": "November",
+    "December": "Desember"
+}
+
+# Ambil tanggal sekarang
 now = datetime.now()
 hari_inggris = now.strftime("%A")
 bulan_inggris = now.strftime("%B")
 
+# Format tanggal dalam Bahasa Indonesia
 tanggal_hari_ini = f"{nama_hari[hari_inggris]}, {now.day:02d} {nama_bulan[bulan_inggris]} {now.year}"
 
+# Tampilkan tanggal di kanan atas
 st.markdown(
     f"""
-    <div style='text-align: right; font-size:16px; font-weight:bold; color:#FFF; background-color:#262730; padding:10px; border-radius:10px'>
-        {tanggal_hari_ini}
+    <div style='text-align: right; font-size:16px; font-weight:bold; color:#FFFFFF; background-color:#262730; padding:10px; border-radius:10px; margin-bottom:20px'>
+        📅 {tanggal_hari_ini}
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 
 # ============================
